@@ -1,0 +1,228 @@
+#include <Colorduino.h>
+
+typedef struct {
+  unsigned char r;
+  unsigned char g;
+  unsigned char b;
+} ColorRGB;
+
+ColorRGB const black = {0, 0, 0};
+ColorRGB const red = {255, 0, 0};
+ColorRGB const green = {0, 255, 0};
+ColorRGB const blue = {0, 0, 255};
+ColorRGB const white = {255, 255, 255};
+
+ColorRGB screen [ColorduinoScreenWidth][ColorduinoScreenHeight];
+
+void setScreenPixel(unsigned char x, unsigned char y, void *p) {
+  ColorRGB myP = *(ColorRGB *)p;
+  screen[x] [y].r = myP.r;
+  screen[x] [y].g = myP.g;
+  screen[x] [y].b = myP.b;
+}
+
+void display() {
+  unsigned char x, y;
+  PixelRGB *p;
+  for (y = 0; y < ColorduinoScreenHeight; y++) {
+    for (x = 0; x < ColorduinoScreenWidth; x++) {
+      p = Colorduino.GetPixel(x, y);
+      p->r = screen[x][y].r;
+      p->g = screen[x][y].g;
+      p->b = screen[x][y].b;
+    }
+  }
+  Colorduino.FlipPage();
+}
+
+void clearScreen() {
+  unsigned char x, y;
+
+  for (y = 0; y < ColorduinoScreenHeight; y++) {
+    for (x = 0; x < ColorduinoScreenWidth; x++) {
+      setScreenPixel(x, y, (void*)&black);
+    }
+  }
+}
+//les differentes fonctions ci-dessus sont des fonctions reprises du document 
+//"Introduction au Colorduino"
+//declaration de 10 matrices contenant les chiffres de 0-9
+unsigned char chiffres[10][8][4] =
+
+{
+  {
+    {0, 0, 0, 0},
+    {0, 1, 1, 0},
+    {1, 0, 0, 1},
+    {1, 0, 0, 1},
+    {1, 0, 0, 1},
+    {1, 0, 0, 1},
+    {0, 1, 1, 0},
+    {0, 0, 0, 0},
+  },// chiffres 0
+
+  {
+    {0, 0, 0, 0},
+    {0, 0, 1, 0},
+    {0, 1, 1, 0},
+    {0, 0, 1, 0},
+    {0, 0, 1, 0},
+    {0, 0, 1, 0},
+    {0, 1, 1, 1},
+    {0, 0, 0, 0},
+  },//chiffre 1
+
+  {
+    {0, 0, 0, 0},
+    {0, 1, 1, 0},
+    {1, 0, 0, 1},
+    {0, 0, 0, 1},
+    {0, 0, 1, 0},
+    {0, 1, 0, 0},
+    {1, 1, 1, 1},
+    {0, 0, 0, 0},
+  },//chiffre 2
+
+  {
+    {0, 0, 0, 0},
+    {1, 1, 1, 1},
+    {0, 0, 1, 0},
+    {0, 1, 0, 0},
+    {0, 0, 1, 0},
+    {1, 0, 0, 1},
+    {0, 1, 1, 1},
+    {0, 0, 0, 0},
+  },//chiffre 3
+
+  {
+    {0, 0, 0, 0},
+    {0, 0, 0, 1},
+    {0, 0, 1, 1},
+    {0, 1, 0, 1},
+    {1, 1, 1, 1},
+    {0, 0, 0, 1},
+    {0, 0, 0, 1},
+    {0, 0, 0, 0},
+  },//chiffre 4
+
+  {
+    {0, 0, 0, 0},
+    {1, 1, 1, 1},
+    {1, 0, 0, 0},
+    {1, 1, 1, 0},
+    {0, 0, 0, 1},
+    {1, 0, 0, 1},
+    {0, 1, 1, 0},
+    {0, 0, 0, 0},
+  },//chiffre 5
+
+  {
+    {0, 0, 0, 0},
+    {0, 0, 1, 1},
+    {0, 1, 0, 0},
+    {1, 0, 0, 0},
+    {1, 1, 1, 1},
+    {1, 0, 0, 1},
+    {0, 1, 1, 0},
+    {0, 0, 0, 0},
+  },//chiffre 6
+
+  {
+    {0, 0, 0, 0},
+    {1, 1, 1, 1},
+    {0, 0, 0, 1},
+    {0, 0, 1, 0},
+    {0, 1, 0, 0},
+    {1, 0, 0, 0},
+    {1, 0, 0, 0},
+    {0, 0, 0, 0},
+  },//chiffre 7
+
+  {
+    {0, 0, 0, 0},
+    {0, 1, 1, 0},
+    {1, 0, 0, 1},
+    {0, 1, 1, 0},
+    {1, 0, 0, 1},
+    {1, 0, 0, 1},
+    {0, 1, 1, 0},
+    {0, 0, 0, 0},
+  },//chiffre 8
+
+  {
+    {0, 0, 0, 0},
+    {0, 1, 1, 0},
+    {1, 0, 0, 1},
+    {0, 1, 1, 1},
+    {0, 0, 0, 1},
+    {0, 0, 1, 0},
+    {0, 1, 0, 0},
+    {0, 0, 0, 0},
+  },//chiffre 9
+};
+
+void setup() {
+  
+  Colorduino.Init(); //Initialise la matrice LED
+  unsigned char whiteBalVal[3] = {30, 63, 63};
+  Colorduino.SetWhiteBal(whiteBalVal);
+  clearScreen();
+  display();
+//compense l'intensite relative des trois couleurs R/G/B
+}
+
+void timer(int i) { //Declaration de la fonction timer
+  
+  unsigned char x, y;
+  
+  ColorRGB p;
+  p = red; //Le pointeur p pointe la couleur rouge
+           //consequence: le timer sera rouge
+  
+  int dizaine = i / 10; 
+//Cette fonction servira a faire defiler les dizaines sur le Colorduino
+  int unite = i % 10; 
+// Cette fonction serivra a faire defiler les unites sur le Colorduino
+
+// Cette double-boucle sert  diviser le Colorduino en deux 
+//ainsi que d'afficher les chiffres
+  for (y = 0 ; y < 4; y++) {
+    for (x = 0; x < ColorduinoScreenWidth; x++) {
+      if (chiffres[dizaine][x][y] == 1) {
+        setScreenPixel(x, y, (void *)&p);
+      }
+    }
+  }
+/*Cette boucle permet d'afficher les dizaines sur les 4 premieres
+*colonnes du Colorduino.
+*Le "if(chiffres[dizaine][x][y] == 1){ setScreenPixel(x, y, (void *)&p);}" 
+*sert a afficher les dizaines a l'aide des matrices
+*declarees plus haut. Les chiffres s'afficheront en 
+*rouge grace au pointeur present dans la fonction setScreenPixel*/
+  for (y = 0 ; y < 4; y++) {
+    for (x = 0; x < ColorduinoScreenWidth; x++) {
+      if (chiffres[unite][x][y] == 1) {
+        setScreenPixel(x, y + 4, (void *)&p);
+      }
+    }
+  }
+/*Cette boucle permet d'afficher les unites sur les4 dernieres 
+*colonnes du Colorduino.
+*Le "if(chiffres[unite][x][y] == 1){ setScreenPixel(x, y+4, (void *)&p);}" 
+*sert a afficher les unites a l'aide des matrices
+*declarees plus haut. Les chiffres s'afficheront en 
+*rouge grace au pointeur present dans la fonction setScreenPixel*/
+}
+void loop() {
+// La fonction "loop" servira a repeter les fonctions presentes plus haut
+  int i;
+  for (i = 99; i >=0 ; i--) { 
+/*Cette boucle sert  faire varier le i present dans les fonctions 
+*"unite et dizaine" de 99-0*/
+    timer(i); //Appel la fonction timer
+    display();//Affiche sur le Colorduino
+    delay(1000);//Met un delai de 1 seconde (1000ms)
+    clearScreen();//efface le Colorduino
+  }
+}
+//Fin du programme 
